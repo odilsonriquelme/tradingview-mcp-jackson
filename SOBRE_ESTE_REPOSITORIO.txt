@@ -1,0 +1,66 @@
+REPOSITÓRIO: tradingview-mcp-jackson
+TIPO: Fork Público (espelho — sincronizado com o upstream, sem commits próprios à frente)
+LINGUAGEM: JavaScript (Node.js)
+URL (seu fork):   https://github.com/odilsonriquelme/tradingview-mcp-jackson
+UPSTREAM (fork de): https://github.com/LewisWJackson/tradingview-mcp-jackson
+ORIGEM ORIGINAL:    https://github.com/tradesdontlie/tradingview-mcp (@tradesdontlie)
+
+CADEIA DE FORKS
+---------------
+tradesdontlie/tradingview-mcp  (projeto original/base)
+   └── LewisWJackson/...        (fork "Jackson" — adiciona morning brief, rules.json, fix de launch)
+          └── odilsonriquelme/...  (SEU fork — espelho do Jackson, sem alterações próprias)
+
+DESCRIÇÃO
+---------
+Servidor MCP (Model Context Protocol) que conecta o Claude Code ao app TradingView Desktop
+(via Chrome DevTools Protocol) para análise automatizada de gráficos. Tudo roda LOCALMENTE
+— nenhum dado do TradingView sai da máquina. Exige assinatura válida do TradingView (não
+burla paywall; apenas lê/controla o app já rodando).
+
+O QUE O FORK "JACKSON" ADICIONA (sobre o original)
+---------------------------------------------------
+- morning_brief: um comando que varre a watchlist, lê todos os indicadores e retorna dados
+  estruturados para o Claude gerar o "bias" da sessão
+- session_save / session_get: salva o brief diário em ~/.tradingview-mcp/sessions/ (compara
+  hoje vs ontem)
+- rules.json: regras de trading escritas uma vez (critérios de bias, risco, watchlist),
+  aplicadas automaticamente no morning brief
+- Correção do tv_launch para TradingView Desktop v2.14+
+- CLI "tv brief" (rodar o morning brief pelo terminal)
+
+ARQUITETURA (3 camadas) — pasta src/
+-------------------------------------
+src/server.js        → ponto de entrada do servidor MCP
+src/connection.js    → conexão com o TradingView via Chrome DevTools Protocol
+src/core/            → LÓGICA de cada domínio (chart, data, indicators, drawing, replay,
+                       alerts, morning, watchlist, pine, ui, pane, tab, capture, stream...)
+src/tools/           → DEFINIÇÕES das ferramentas MCP (o que o Claude enxerga) — espelha core/
+src/cli/commands/    → INTERFACE de terminal (mesmos domínios como subcomandos do "tv")
+
+OUTROS DIRETÓRIOS
+-----------------
+scripts/   → utilitários:
+   pine_push.js / pine_pull.js          → envia/baixa scripts Pine do TradingView Editor
+   launch_tv_debug_mac.sh / _linux.sh   → inicia o TV Desktop em modo debug (necessário p/ MCP)
+   launch_tv_debug.bat / .vbs           → equivalentes para Windows
+skills/    → 5 skills do projeto (instruções para o Claude operar workflows):
+   chart-analysis, multi-symbol-scan, pine-develop, replay-practice, strategy-report
+agents/    → performance-analyst.md (prompt de agente analista de performance)
+tests/     → testes (pine_analyze, cli, e2e)
+
+ARQUIVOS RAIZ NOTÁVEIS
+----------------------
+scalper-run.js        → EXEMPLO de scalper (VWAP+RSI(3)+EMA(8), 10s, XRP/USDT) — caso de uso,
+                        não o foco do projeto
+rules.json / rules.example.json → config de regras de trading
+safety-check-log.json → log de decisões de segurança do scalper
+README.md             → documentação do fork (muito completa). Aponta para o repo do Jackson.
+CLAUDE.md             → instruções para o Claude Code operar no projeto
+SETUP_GUIDE.md, RESEARCH.md, SECURITY.md → guias de setup, pesquisa e segurança
+
+OBSERVAÇÃO (fork)
+-----------------
+Como é um espelho do upstream do Jackson, README/código são de terceiros — não editar.
+Push deste repo vai apenas para o SEU fork no GitHub, nunca para o projeto do Jackson.
+Relaciona-se ao seu projeto [TRD] Ape Bitcoiner (análise de mercado com TradingView MCP).
